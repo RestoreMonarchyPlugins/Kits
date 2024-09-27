@@ -7,15 +7,19 @@ namespace RestoreMonarchy.Kits.Helpers
     {
         internal static VehicleAsset GetVehicleByNameOrId(string name)
         {
-            List<VehicleAsset> assets = new();
+            if (ushort.TryParse(name, out ushort id))
+            {
+                return (VehicleAsset)Assets.find(EAssetType.VEHICLE, id);
+            }
+
+            List<VehicleAsset> assets = [];
+
             Assets.find(assets);
 
             VehicleAsset vehicleAsset = null;
             foreach (VehicleAsset asset in assets)
             {
-                if (asset != null &&
-                    asset.id.ToString() == name
-                    || (asset.FriendlyName != null && asset.FriendlyName.ToLower().Contains(name.ToLower())))
+                if (asset != null && (asset.FriendlyName != null && asset.FriendlyName.ToLower().Contains(name.ToLower())))
                 {
                     vehicleAsset = asset;
                     break;

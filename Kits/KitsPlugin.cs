@@ -41,6 +41,7 @@ namespace RestoreMonarchy.Kits
         protected override void Unload()
         {
             SaveManager.onPostSave -= OnPostSave;
+            KitCooldownsDatabase.Save();
 
             Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
@@ -48,17 +49,32 @@ namespace RestoreMonarchy.Kits
         public override TranslationList DefaultTranslations => new()
         {
             { "KitCommandSyntax", "You must specify kit name." },
+            { "KitCommandConsoleSyntax", "You must specify kit name and player you want to receive the kit." },
             { "KitNotFound", "Kit [[b]]{0}[[/b]] not found." },
             { "KitGlobalCooldown", "You have to wait [[b]]{0}[[/b]] before using any kit again." },
             { "KitCooldown", "You have to wait [[b]]{0}[[/b]] before using kit [[b]]{1}[[/b]] again." },
+            { "KitNotEnoughMoney", "You can't afford to buy this kit for [[b]]${0}[[/b]] credits." },
             { "KitReceived", "You received kit [[b]]{0}[[/b]]." },
+            { "KitReceivedFromSomeone", "You received kit [[b]]{0}[[/b]] from [[b]]{1}[[/b]]." },
+            { "KitGiven", "You have given kit [[b]]{0}[[/b]] to [[b]]{1}[[/b]]." },
             { "KitAlreadyExists", "Kit [[b]]{0}[[/b]] already exists." },
-            { "CreateKitCommandSyntax", "You must specify kit name and cooldown." },
+            { "CreateKitCommandSyntax", "Usage: /ckit [[name]] [[cooldown]] [price] [experience] [vehicle]" },
+            { "CreateKitNameInvalid", "Name must contain no special characters. [[b]]{0}[[/b]] is invalid." },
             { "CreateKitCooldownNotNumber", "Cooldown must be a number. [[b]]{0}[[/b]] is invalid." },
             { "CreateKitPriceNotNumber", "Price must be a number. [[b]]{0}[[/b]] is invalid." },
+            { "CreateKitUconomyNotInstalled", "You must install Uconomy plugin to create kits with prices." },
             { "CreateKitExperienceNotNumber", "Experience must be a number. [[b]]{0}[[/b]] is invalid." },
             { "CreateKitVehicleNotFound", "Vehicle [[b]]{0}[[/b]] not found." },
-            { "KitCreated", "Created kit [[b]]{0}[[/b]] with [[b]]{1}[[/b]] cooldown." },
+            { "KitCreated", "Created kit [[b]]{0}[[/b]] with [[b]]{1}[[/b]] cooldown and [[b]]{2}[[/b]] items." },
+            { "NoKitsAvailable", "You don't have access to any kits." },
+            { "KitNameFormat", "{0}" },
+            { "KitPriceFormat", "[${0}]" },
+            { "KitCooldownFormat", "({0})" },
+            { "KitsAvailable", "Your kits: {0}" },
+            { "DeleteKitCommandSyntax", "You must specify kit name." },
+            { "KitDeleted", "Deleted kit [[b]]{0}[[/b]]." },
+            { "KitOtherNoPermission", "You don't have permission to give kit to other players." },
+            { "PlayerNotFound", "Player {0} not found." },
             { "Day", "1 day" },
             { "Days", "{0} days" },
             { "Hour", "1 hour" },
@@ -67,7 +83,11 @@ namespace RestoreMonarchy.Kits
             { "Minutes", "{0} minutes" },
             { "Second", "1 second" },
             { "Seconds", "{0} seconds" },
-            { "Zero", "a moment" }
+            { "Zero", "a moment" },
+            { "DayShort", "{0}d" },
+            { "HourShort", "{0}h" },
+            { "MinuteShort", "{0}m" },
+            { "SecondShort", "{0}s" }
         };
 
         private void OnPostSave()
@@ -88,6 +108,23 @@ namespace RestoreMonarchy.Kits
                 items.Add(span.Minutes == 1 ? Translate("Minute") : Translate("Minutes", span.Minutes));
             if (items.Count < 2 && span.Seconds > 0)
                 items.Add(span.Seconds == 1 ? Translate("Second") : Translate("Seconds", span.Seconds));
+
+            return string.Join(" ", items);
+        }
+
+        public string FormatTimespanShort(TimeSpan span)
+        {
+            if (span <= TimeSpan.Zero) return Translate("SecondShort", 0);
+
+            List<string> items = new();
+            if (span.Days > 0)
+                items.Add(Translate("DayShort", span.Days));
+            if (span.Hours > 0)
+                items.Add(Translate("HourShort", span.Hours));
+            if (items.Count < 2 && span.Minutes > 0)
+                items.Add(Translate("MinuteShort", span.Minutes));
+            if (items.Count < 2 && span.Seconds > 0)
+                items.Add(Translate("SecondShort", span.Seconds));
 
             return string.Join(" ", items);
         }

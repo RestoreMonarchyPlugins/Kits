@@ -10,6 +10,8 @@ namespace RestoreMonarchy.Kits.Models
         [XmlAttribute]
         public string SteamId { get; set; }
         [XmlAttribute]
+        public DateTime Date { get; set; }
+        [XmlAttribute]
         public DateTime EndDate { get; set; }
     }
 }

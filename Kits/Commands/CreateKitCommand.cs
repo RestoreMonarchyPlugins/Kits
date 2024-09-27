@@ -1,6 +1,7 @@
 ﻿using RestoreMonarchy.Kits.Helpers;
 using RestoreMonarchy.Kits.Models;
 using Rocket.API;
+using Rocket.Unturned.Player;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,13 @@ namespace RestoreMonarchy.Kits.Commands
             }
 
             string kitName = command[0];
+
+            if (kitName.Any(ch => !char.IsLetterOrDigit(ch)))
+            {
+                pluginInstance.SendMessageToPlayer(caller, "CreateKitNameInvalid", kitName);
+                return;
+            }
+
             Kit kit = pluginInstance.Kits.FirstOrDefault(x => x.Name.Equals(kitName, StringComparison.OrdinalIgnoreCase));
             if (kit != null)
             {
@@ -40,6 +48,12 @@ namespace RestoreMonarchy.Kits.Commands
             if (command.Length > 2 && !uint.TryParse(command[2], out price))
             {
                 pluginInstance.SendMessageToPlayer(caller, "CreateKitPriceNotNumber", command[2]);
+                return;
+            }
+
+            if (price > 0 && !UconomyHelper.IsInstalled())
+            {
+                pluginInstance.SendMessageToPlayer(caller, "CreateKitUconomyNotInstalled");
                 return;
             }
 
@@ -69,15 +83,110 @@ namespace RestoreMonarchy.Kits.Commands
                 Cooldown = cooldown,
                 Price = price,
                 Experience = experience,
-                VehicleId = vehicleId
+                VehicleId = vehicleId,
+                Items = new()
             };
+
+            UnturnedPlayer player = (UnturnedPlayer)caller;
+
+            PlayerInventory inventory = player.Player.inventory;
+            PlayerClothing clothing = player.Player.clothing;
+
+            List<ItemAsset> clothes =
+                [
+                    clothing.backpackAsset,
+                    clothing.glassesAsset,
+                    clothing.hatAsset,
+                    clothing.maskAsset,
+                    clothing.pantsAsset,
+                    clothing.shirtAsset,
+                    clothing.vestAsset
+                ]; 
+
+            foreach (ItemAsset itemAsset in clothes)
+            {
+                if (itemAsset != null)
+                {
+                    kit.Items.Add(new KitItem
+                    {
+                        Id = itemAsset.id,
+                        Name = itemAsset.itemName,
+                        Amount = 1
+                    });
+                }
+            }
+
+            ItemJar secondaryItem = inventory.getItem(1, 0);
+            ItemJar primaryItem = inventory.getItem(0, 0);
+
+            if (secondaryItem != null)
+            {
+                kit.Items.Add(new KitItem
+                {
+                    Id = secondaryItem.item.id,
+                    Name = secondaryItem.GetAsset<ItemAsset>().itemName,
+                    Amount = 1,
+                    Metadata = secondaryItem.item.state
+                });
+            }
+
+            if (primaryItem != null)
+            {
+                kit.Items.Add(new KitItem
+                {
+                    Id = primaryItem.item.id,
+                    Name = primaryItem.GetAsset<ItemAsset>().itemName,
+                    Amount = 1,
+                    Metadata = primaryItem.item.state
+                });
+            }
+
+            for (byte page = 2; page < PlayerInventory.PAGES - 2; page++)
+            {
+                byte width = inventory.getWidth(page);
+                byte height = inventory.getHeight(page);
+
+                List<ItemJar> items = inventory.items[page].items.ToList();
+
+                items = items.OrderBy(x => x.y).ThenBy(x => x.x).ToList();
+
+                foreach (ItemJar item in items)
+                {
+                    kit.Items.Add(new KitItem
+                    {
+                        Id = item.item.id,
+                        Name = item.GetAsset<ItemAsset>().itemName,
+                        Amount = 1,
+                        Metadata = item.item.state
+                    });
+                }
+            }
+
+            for (int i = 0; i < kit.Items.Count; i++)
+            {
+                for (int j = i + 1; j < kit.Items.Count; j++)
+                {
+                    if (kit.Items[i].Id == kit.Items[j].Id && (kit.Items[i].Metadata?.SequenceEqual(kit.Items[j].Metadata ?? []) ?? kit.Items[j].Metadata == null))
+                    {
+                        kit.Items[i].Amount++;
+                        kit.Items.RemoveAt(j);
+                        j--;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
 
             TimeSpan cooldownSpan = TimeSpan.FromSeconds(cooldown);
             string cooldownString = pluginInstance.FormatTimespan(cooldownSpan);
 
             pluginInstance.Kits.Add(kit);
             pluginInstance.KitsDatabase.Save();
-            pluginInstance.SendMessageToPlayer(caller, "KitCreated", kitName, cooldownString);
+            InventoryHelper.ClearPlayerInventory(player.Player);
+            kit.GiveKit(player);
+            pluginInstance.SendMessageToPlayer(caller, "KitCreated", kitName, cooldownString, kit.Items.Count);
         }
 
         public AllowedCaller AllowedCaller => AllowedCaller.Player;

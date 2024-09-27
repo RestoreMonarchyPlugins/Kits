@@ -11,7 +11,7 @@ namespace RestoreMonarchy.Kits.Models
         public bool ShouldSerializeName() => !string.IsNullOrEmpty(Name);
         [XmlAttribute]
         public byte Amount { get; set; }
-        public bool ShouldSerializeAmount() => Amount != 1;
+        public bool ShouldSerializeAmount() => Amount > 1;
         [XmlAttribute]
         public byte[] Metadata { get; set; }
         public bool ShouldSerializeMetadata() => Metadata != null && Metadata.Length > 0;
