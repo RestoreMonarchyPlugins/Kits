@@ -77,7 +77,7 @@ namespace RestoreMonarchy.Kits.Commands
             UnturnedPlayer player;
             if (command.Length > 1)
             {
-                if (!caller.HasPermission("kit.other"))
+                if (!caller.HasPermission("givekit"))
                 {
                     pluginInstance.SendMessageToPlayer(caller, "KitOtherNoPermission");
                     return;
