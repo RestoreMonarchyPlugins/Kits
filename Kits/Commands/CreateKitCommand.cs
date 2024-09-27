@@ -65,9 +65,10 @@ namespace RestoreMonarchy.Kits.Commands
             }
 
             ushort vehicleId = 0;
+            string vehicleName = null;
             if (command.Length > 4)
             {
-                VehicleAsset vehicleAsset = VehicleHelper.GetVehicleByNameOrId(command[4]);
+                Asset vehicleAsset = VehicleHelper.GetVehicleByNameOrId(command[4]);
                 if (vehicleAsset == null)
                 {
                     pluginInstance.SendMessageToPlayer(caller, "CreateKitVehicleNotFound", command[4]);
@@ -75,6 +76,7 @@ namespace RestoreMonarchy.Kits.Commands
                 }
 
                 vehicleId = vehicleAsset.id;
+                vehicleName = vehicleAsset.FriendlyName;
             }
 
             kit = new()
@@ -84,6 +86,7 @@ namespace RestoreMonarchy.Kits.Commands
                 Price = price,
                 Experience = experience,
                 VehicleId = vehicleId,
+                VehicleName = vehicleName,
                 Items = new()
             };
 

@@ -14,14 +14,17 @@ namespace RestoreMonarchy.Kits.Models
         [XmlAttribute]
         public int Cooldown { get; set; }
         [XmlAttribute]
+        public decimal Price { get; set; }
+        public bool ShouldSerializePrice() => Price > 0;
+        [XmlAttribute]
         public uint Experience { get; set; }
         public bool ShouldSerializeExperience() => Experience > 0;
         [XmlAttribute]
         public ushort VehicleId { get; set; }
         public bool ShouldSerializeVehicleId() => VehicleId > 0;
         [XmlAttribute]
-        public decimal Price { get; set; }
-        public bool ShouldSerializePrice() => Price > 0;
+        public string VehicleName { get; set; }
+        public bool ShouldSerializeVehicleName() => !string.IsNullOrEmpty(VehicleName);
 
         [XmlArrayItem("Item")]
         public List<KitItem> Items { get; set; }
@@ -54,7 +57,7 @@ namespace RestoreMonarchy.Kits.Models
 
             if (VehicleId > 0)
             {
-                VehicleAsset vehicleAsset = (VehicleAsset)Assets.find(EAssetType.VEHICLE, VehicleId);
+                Asset vehicleAsset = Assets.find(EAssetType.VEHICLE, VehicleId);
                 if (vehicleAsset != null)
                 {
                     player.GiveVehicle(vehicleAsset.id);

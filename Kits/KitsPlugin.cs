@@ -67,7 +67,7 @@ namespace RestoreMonarchy.Kits
             { "CreateKitVehicleNotFound", "Vehicle [[b]]{0}[[/b]] not found." },
             { "KitCreated", "Created kit [[b]]{0}[[/b]] with [[b]]{1}[[/b]] cooldown and [[b]]{2}[[/b]] items." },
             { "NoKitsAvailable", "You don't have access to any kits." },
-            { "KitNameFormat", "{0}" },
+            { "KitNameFormat", "[[b]]{0}[[/b]]" },
             { "KitPriceFormat", "[${0}]" },
             { "KitCooldownFormat", "({0})" },
             { "KitsAvailable", "Your kits: {0}" },
