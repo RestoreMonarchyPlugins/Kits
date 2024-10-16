@@ -48,7 +48,7 @@ namespace RestoreMonarchy.Kits
 
         public override TranslationList DefaultTranslations => new()
         {
-            { "KitCommandSyntax", "You must specify kit name." },
+            { "KitCommandSyntax", "You must specify kit name. Use [[b]]/kits[[/b]] to see the list of available kits." },
             { "KitCommandConsoleSyntax", "You must specify kit name and player you want to receive the kit." },
             { "KitNotFound", "Kit [[b]]{0}[[/b]] not found." },
             { "KitGlobalCooldown", "You have to wait [[b]]{0}[[/b]] before using any kit again." },
@@ -73,6 +73,7 @@ namespace RestoreMonarchy.Kits
             { "KitsAvailable", "Your kits: {0}" },
             { "DeleteKitCommandSyntax", "You must specify kit name." },
             { "KitDeleted", "Deleted kit [[b]]{0}[[/b]]." },
+            { "KitNoPermission", "You don't have permission to use kit [[b]]{0}[[/b]]." },
             { "KitOtherNoPermission", "You don't have permission to give kit to other players." },
             { "PlayerNotFound", "Player {0} not found." },
             { "Day", "1 day" },

@@ -37,6 +37,12 @@ namespace RestoreMonarchy.Kits.Commands
                 return;
             }
 
+            if (!caller.HasPermission($"kit.{kit.Name.ToLower()}"))
+            {
+                pluginInstance.SendMessageToPlayer(caller, "KitNoPermission", kit.Name);
+                return;
+            }
+
             if (!caller.HasPermission("kits.admin"))
             {
                 KitCooldown cooldown;
