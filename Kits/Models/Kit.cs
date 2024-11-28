@@ -34,15 +34,20 @@ namespace RestoreMonarchy.Kits.Models
         {
             foreach (KitItem kitItem in Items)
             {
-                Item item = new(kitItem.Id, true);
-                if (kitItem.Metadata != null && kitItem.Metadata.Length > 0)
-                {
-                    item.metadata = kitItem.Metadata;
-                }
-
                 byte amount = Math.Max((byte)1, kitItem.Amount);
                 for (int i = 0; i < amount; i++)
                 {
+                    Item item = new(kitItem.Id, true);
+                    if (kitItem.Metadata != null && kitItem.Metadata.Length > 0)
+                    {
+                        // copy metadata to prevent reference issues
+                        item.metadata = new byte[kitItem.Metadata.Length];
+                        Array.Copy(kitItem.Metadata, item.metadata, kitItem.Metadata.Length);
+
+                        // instead of assigning it like this
+                        // item.metadata = kitItem.Metadata;
+                    }
+
                     if (!player.Player.inventory.tryAddItem(item, true))
                     {
                         ItemManager.dropItem(item, player.Position, true, true, true);
