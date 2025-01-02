@@ -48,7 +48,8 @@ namespace RestoreMonarchy.Kits.Commands
                 KitCooldown cooldown;
                 if (pluginInstance.Configuration.Instance.GlobalCooldown > 0)
                 {
-                    cooldown = pluginInstance.Cooldowns.OrderByDescending(x => x.Date).FirstOrDefault();
+                    cooldown = pluginInstance.Cooldowns.Where(x => x.SteamId == caller.Id).OrderByDescending(x => x.Date).FirstOrDefault();
+
                     if (cooldown != null)
                     {
                         TimeSpan timeSpan = cooldown.Date.AddSeconds(pluginInstance.Configuration.Instance.GlobalCooldown) - DateTime.Now;
@@ -78,6 +79,9 @@ namespace RestoreMonarchy.Kits.Commands
                     EndDate = DateTime.Now.AddSeconds(kit.Cooldown)
                 };
                 pluginInstance.Cooldowns.Add(cooldown);
+            } else
+            {
+                pluginInstance.SendMessageToPlayer(caller, "KitAdminBypassPermission");
             }
 
             UnturnedPlayer player;

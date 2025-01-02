@@ -9,6 +9,8 @@ Create kits with custom items, cooldown, price, experience and vehicle.
 * Global cooldown prevents players from using kits too often.
 * Kits are saved in XML file and can be easily edited. Remember to reload the configuration after editing the file.
 
+> **Note:** Admins bypass cooldowns and can use kits without any restrictions. Do not give `kits.admin` permission to normal players.
+
 ## Commands
 * `/kit <name>` - Use the kit.
 * `/kit <name> <player>` - Give the kit to another player. Requires `givekit` permission.
@@ -71,17 +73,21 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <Translations xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Translation Id="KitCommandSyntax" Value="You must specify kit name." />
+  <Translation Id="KitCommandSyntax" Value="You must specify kit name. Use [[b]]/kits[[/b]] to see the list of available kits." />
   <Translation Id="KitCommandConsoleSyntax" Value="You must specify kit name and player you want to receive the kit." />
   <Translation Id="KitNotFound" Value="Kit [[b]]{0}[[/b]] not found." />
   <Translation Id="KitGlobalCooldown" Value="You have to wait [[b]]{0}[[/b]] before using any kit again." />
   <Translation Id="KitCooldown" Value="You have to wait [[b]]{0}[[/b]] before using kit [[b]]{1}[[/b]] again." />
+  <Translation Id="KitNotEnoughMoney" Value="You can't afford to buy this kit for [[b]]${0}[[/b]] credits." />
   <Translation Id="KitReceived" Value="You received kit [[b]]{0}[[/b]]." />
+  <Translation Id="KitReceivedFromSomeone" Value="You received kit [[b]]{0}[[/b]] from [[b]]{1}[[/b]]." />
+  <Translation Id="KitGiven" Value="You have given kit [[b]]{0}[[/b]] to [[b]]{1}[[/b]]." />
   <Translation Id="KitAlreadyExists" Value="Kit [[b]]{0}[[/b]] already exists." />
-  <Translation Id="CreateKitCommandSyntax" Value="Use the following format: /ckit [[name]] [[cooldown]] [price] [experience] [vehicle]" />
+  <Translation Id="CreateKitCommandSyntax" Value="Usage: /ckit [[name]] [[cooldown]] [price] [experience] [vehicle]" />
   <Translation Id="CreateKitNameInvalid" Value="Name must contain no special characters. [[b]]{0}[[/b]] is invalid." />
   <Translation Id="CreateKitCooldownNotNumber" Value="Cooldown must be a number. [[b]]{0}[[/b]] is invalid." />
   <Translation Id="CreateKitPriceNotNumber" Value="Price must be a number. [[b]]{0}[[/b]] is invalid." />
+  <Translation Id="CreateKitUconomyNotInstalled" Value="You must install Uconomy plugin to create kits with prices." />
   <Translation Id="CreateKitExperienceNotNumber" Value="Experience must be a number. [[b]]{0}[[/b]] is invalid." />
   <Translation Id="CreateKitVehicleNotFound" Value="Vehicle [[b]]{0}[[/b]] not found." />
   <Translation Id="KitCreated" Value="Created kit [[b]]{0}[[/b]] with [[b]]{1}[[/b]] cooldown and [[b]]{2}[[/b]] items." />
@@ -92,6 +98,7 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
   <Translation Id="KitsAvailable" Value="Your kits: {0}" />
   <Translation Id="DeleteKitCommandSyntax" Value="You must specify kit name." />
   <Translation Id="KitDeleted" Value="Deleted kit [[b]]{0}[[/b]]." />
+  <Translation Id="KitNoPermission" Value="You don't have permission to use kit [[b]]{0}[[/b]]." />
   <Translation Id="KitOtherNoPermission" Value="You don't have permission to give kit to other players." />
   <Translation Id="PlayerNotFound" Value="Player {0} not found." />
   <Translation Id="Day" Value="1 day" />
@@ -107,9 +114,6 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
   <Translation Id="HourShort" Value="{0}h" />
   <Translation Id="MinuteShort" Value="{0}m" />
   <Translation Id="SecondShort" Value="{0}s" />
-  <Translation Id="KitReceivedFromSomeone" Value="You received kit [[b]]{0}[[/b]] from [[b]]{1}[[/b]]." />
-  <Translation Id="KitGiven" Value="You have given kit [[b]]{0}[[/b]] to [[b]]{1}[[/b]]." />
-  <Translation Id="KitNotEnoughMoney" Value="You can't afford to buy this kit for [[b]]${0}[[/b]] credits." />
-  <Translation Id="CreateKitUconomyNotInstalled" Value="You must install Uconomy plugin to create kits with prices." />
+  <Translation Id="KitAdminBypassPermission" Value="You have bypassed kit cooldown, because you are admin or have kits.admin permission." />
 </Translations>
 ```

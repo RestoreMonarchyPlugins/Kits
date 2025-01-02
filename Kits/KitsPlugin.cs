@@ -88,7 +88,8 @@ namespace RestoreMonarchy.Kits
             { "DayShort", "{0}d" },
             { "HourShort", "{0}h" },
             { "MinuteShort", "{0}m" },
-            { "SecondShort", "{0}s" }
+            { "SecondShort", "{0}s" },
+            { "KitAdminBypassPermission", "You have bypassed kit cooldown, because you are admin or have kits.admin permission." }
         };
 
         private void OnPostSave()
