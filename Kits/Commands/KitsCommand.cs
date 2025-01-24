@@ -36,7 +36,7 @@ namespace RestoreMonarchy.Kits.Commands
             {
                 string kitName = pluginInstance.Translate("KitNameFormat", kit.Name);
                 string kitPrice = kit.Price > 0 ? pluginInstance.Translate("KitPriceFormat", kit.Price) : "";
-                KitCooldown cooldown = pluginInstance.Cooldowns.Find(x => x.SteamId == caller.Id && x.KitName.Equals(kit.Name, System.StringComparison.OrdinalIgnoreCase));
+                KitCooldown cooldown = pluginInstance.GetCooldown(caller.Id, kit.Name);
                 string kitCooldown = "";
                 if (cooldown != null && !hasKitAdmin && cooldown.EndDate > DateTime.Now)
                 {

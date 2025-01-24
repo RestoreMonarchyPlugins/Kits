@@ -92,6 +92,13 @@ namespace RestoreMonarchy.Kits
             { "KitAdminBypassPermission", "You have bypassed kit cooldown, because you are admin or have kits.admin permission." }
         };
 
+        public KitCooldown GetCooldown(string steamId, string kitName)
+        {
+            Cooldowns.RemoveAll(x => x.EndDate < DateTime.Now);
+
+            return Cooldowns.Find(x => x.SteamId == steamId && x.KitName.Equals(kitName, StringComparison.OrdinalIgnoreCase));
+        }
+
         private void OnPostSave()
         {
             KitCooldownsDatabase.Save();
@@ -99,7 +106,7 @@ namespace RestoreMonarchy.Kits
 
         public string FormatTimespan(TimeSpan span)
         {
-            if (span <= TimeSpan.Zero) return Translate("Zero");
+            if (span < TimeSpan.FromSeconds(1)) return Translate("Zero");
 
             List<string> items = new();
             if (span.Days > 0)

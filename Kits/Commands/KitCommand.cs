@@ -62,7 +62,7 @@ namespace RestoreMonarchy.Kits.Commands
                     }
                 }
 
-                cooldown = pluginInstance.Cooldowns.Find(x => x.SteamId == caller.Id && x.KitName.Equals(kit.Name, StringComparison.OrdinalIgnoreCase));
+                cooldown = pluginInstance.GetCooldown(caller.Id, kitName);
                 if (cooldown != null && cooldown.EndDate > DateTime.Now)
                 {
                     TimeSpan timeSpan = cooldown.EndDate - DateTime.Now;
