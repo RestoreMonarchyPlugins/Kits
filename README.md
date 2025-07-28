@@ -33,7 +33,7 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
 <!-- Optional givekit permission. I don't recommend giving it to players -->
 <Permission Cooldown="0">givekit</Permission>
 
-<!-- Admin permission that grants access to all commands and bypasses cooldowns. DO NOT GIVE IT TO NORMAL PLAYERS! -->
+<!-- Admin permission that grants access to all commands, kits and bypasses cooldowns. DO NOT GIVE IT TO NORMAL PLAYERS! -->
 <Permission Cooldown="0">kits.admin</Permission>
 ```
 

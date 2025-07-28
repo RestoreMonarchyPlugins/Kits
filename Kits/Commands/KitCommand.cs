@@ -37,7 +37,7 @@ namespace RestoreMonarchy.Kits.Commands
                 return;
             }
 
-            if (!caller.HasPermission($"kit.{kit.Name.ToLower()}"))
+            if (!caller.HasPermission($"kit.{kit.Name.ToLower()}") && !caller.HasPermission("kits.admin"))
             {
                 pluginInstance.SendMessageToPlayer(caller, "KitNoPermission", kit.Name);
                 return;
