@@ -15,7 +15,7 @@ namespace RestoreMonarchy.Kits.Commands
         public void Execute(IRocketPlayer caller, string[] command)
         {
             List<Permission> permissions = caller.GetPermissions();
-            permissions = permissions.FindAll(x => x.Name.StartsWith("kit."));
+            permissions = permissions.FindAll(x => x.Name.StartsWith("kit.", StringComparison.OrdinalIgnoreCase));
 
             List<Kit> kitsWithPermission = pluginInstance.Kits.ToList();
             if (!caller.HasPermission("kits.admin"))

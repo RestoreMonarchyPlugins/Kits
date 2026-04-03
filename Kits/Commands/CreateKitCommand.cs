@@ -175,10 +175,6 @@ namespace RestoreMonarchy.Kits.Commands
                         kit.Items.RemoveAt(j);
                         j--;
                     }
-                    else
-                    {
-                        break;
-                    }
                 }
             }
 
