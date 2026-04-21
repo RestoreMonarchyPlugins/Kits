@@ -7,6 +7,7 @@ Create kits with custom items, cooldown, price, experience and vehicle.
 * Cooldowns are saved in database and are not lost after server restart.
 * Kits can be created in-game using command.
 * Global cooldown prevents players from using kits too often.
+* Limited claims (`MaxClaims`) — restrict a kit to N lifetime claims per player. Combine with `Cooldown` to space out the claims.
 * Kits are saved in XML file and can be easily edited. Remember to reload the configuration after editing the file.
 
 > **Note:** Admins bypass cooldowns and can use kits without any restrictions. Do not give `kits.admin` permission to normal players.
@@ -17,6 +18,7 @@ Create kits with custom items, cooldown, price, experience and vehicle.
 * `/kits` - List all available kits.
 * `/ckit <name> <cooldown> [price] [experience] [vehicle]` - Create a new kit with items in your inventory. `price`, `experience`, `vehicle` are optional and if you want to skip them, use `0`.
 * `/dkit <name>` - Delete a kit.
+* `/resetkit <player|steamId|all> [kitName]` - Reset claim history for limited kits. With `all`, wipes claims across every player; with a kit name, narrows the reset to that kit.
 * `/rocket reload Kits` - Reload the configuration.
 
 ## Permissions
@@ -33,7 +35,10 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
 <!-- Optional givekit permission. I don't recommend giving it to players -->
 <Permission Cooldown="0">givekit</Permission>
 
-<!-- Admin permission that grants access to all commands, kits and bypasses cooldowns. DO NOT GIVE IT TO NORMAL PLAYERS! -->
+<!-- Allows use of /resetkit. kits.admin also grants it. -->
+<Permission Cooldown="0">kits.reset</Permission>
+
+<!-- Admin permission that grants access to all commands, kits and bypasses cooldowns & claim limits. DO NOT GIVE IT TO NORMAL PLAYERS! -->
 <Permission Cooldown="0">kits.admin</Permission>
 ```
 
@@ -65,9 +70,41 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
         <Item Id="6" Name="Military Magazine" Amount="3" />
       </Items>
     </Kit>
+    <!-- One-time starter kit: each player can claim exactly once, ever. -->
+    <Kit Name="Starter" MaxClaims="1">
+      <Items>
+        <Item Id="81" Name="MRE" Amount="3" />
+        <Item Id="14" Name="Water Bottle" Amount="2" />
+        <Item Id="95" Name="Bandage" Amount="3" />
+      </Items>
+    </Kit>
+    <!-- Limited VIP kit: up to 3 claims per player, with 5 minutes between each. -->
+    <Kit Name="VipDaily" MaxClaims="3" Cooldown="300">
+      <Items>
+        <Item Id="253" Name="Alicepack" />
+        <Item Id="81" Name="MRE" Amount="5" />
+      </Items>
+    </Kit>
   </Kits>
 </KitsDatabase>
 ```
+
+### Kit attributes
+* `Name` – Kit identifier. Used in `/kit <name>` and in the `kit.<name>` permission.
+* `Cooldown` – Seconds a player must wait between claims. Set `0` for no cooldown.
+* `Price` – Uconomy cost to claim. Requires Uconomy plugin.
+* `Experience` – Unturned experience granted on claim.
+* `VehicleId` / `VehicleName` – Spawn a vehicle on claim.
+* `MaxClaims` – Lifetime claim limit per player. `0` (default) means unlimited. Claims are stored permanently in `KitClaims.xml`.
+
+### MaxClaims + Cooldown
+The two attributes work independently and can be combined:
+* `MaxClaims="1"` → claim once, ever.
+* `MaxClaims="3"` → claim up to 3 times ever, no wait between claims.
+* `MaxClaims="3" Cooldown="300"` → claim up to 3 times ever, 5-minute cooldown between each claim.
+* `Cooldown="300"` (no `MaxClaims`) → unlimited claims, 5-minute cooldown between each.
+
+Admins (`kits.admin`) bypass both limits and do not count against claim history.
 
 ## Translations
 ```xml
@@ -115,5 +152,11 @@ To grant access to the kit, add the permission `kit.<name>` to the player. For e
   <Translation Id="MinuteShort" Value="{0}m" />
   <Translation Id="SecondShort" Value="{0}s" />
   <Translation Id="KitAdminBypassPermission" Value="You have bypassed kit cooldown, because you are admin or have kits.admin permission." />
+  <Translation Id="KitAlreadyClaimed" Value="You have already claimed kit [[b]]{0}[[/b]] the maximum number of times ([[b]]{1}[[/b]])." />
+  <Translation Id="KitClaimsFormat" Value="({0}/{1})" />
+  <Translation Id="ResetKitCommandSyntax" Value="Usage: /resetkit &lt;player|steamId|all&gt; [kitName]" />
+  <Translation Id="ResetKitNoClaims" Value="No claims found to reset for [[b]]{0}[[/b]]." />
+  <Translation Id="ResetKitPlayer" Value="Reset [[b]]{0}[[/b]] claim(s) for player [[b]]{1}[[/b]]." />
+  <Translation Id="ResetKitAll" Value="Reset [[b]]{0}[[/b]] claim(s) across all players." />
 </Translations>
 ```

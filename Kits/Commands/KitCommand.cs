@@ -45,6 +45,12 @@ namespace RestoreMonarchy.Kits.Commands
 
             if (!caller.HasPermission("kits.admin"))
             {
+                if (kit.MaxClaims > 0 && pluginInstance.HasReachedMaxClaims(caller.Id, kit.Name, kit.MaxClaims))
+                {
+                    pluginInstance.SendMessageToPlayer(caller, "KitAlreadyClaimed", kit.Name, kit.MaxClaims);
+                    return;
+                }
+
                 KitCooldown cooldown;
                 if (pluginInstance.Configuration.Instance.GlobalCooldown > 0)
                 {
@@ -125,6 +131,13 @@ namespace RestoreMonarchy.Kits.Commands
             }
             
             kit.GiveKit(player);
+
+            if (kit.MaxClaims > 0 && !caller.HasPermission("kits.admin"))
+            {
+                KitClaim claim = pluginInstance.RecordClaim(caller.Id, kit.Name);
+                Logger.Log($"{caller.DisplayName} ({caller.Id}) claimed limited kit {kit.Name} ({claim.Count}/{kit.MaxClaims})");
+            }
+
             if (player == caller)
             {
                 pluginInstance.SendMessageToPlayer(player, "KitReceived", kit.Name);

@@ -19,9 +19,11 @@ namespace RestoreMonarchy.Kits
 
         public KitsXmlDatabase KitsDatabase { get; private set; }
         public KitCooldownsXmlDatabase KitCooldownsDatabase { get; private set; }
+        public KitClaimsXmlDatabase KitClaimsDatabase { get; private set; }
 
         public List<Kit> Kits => KitsDatabase.Database.Kits;
         public List<KitCooldown> Cooldowns => KitCooldownsDatabase.Database.Cooldowns;
+        public List<KitClaim> Claims => KitClaimsDatabase.Database.Claims;
 
         protected override void Load()
         {
@@ -32,6 +34,8 @@ namespace RestoreMonarchy.Kits
             KitsDatabase.Load();
             KitCooldownsDatabase = new KitCooldownsXmlDatabase();
             KitCooldownsDatabase.Load();
+            KitClaimsDatabase = new KitClaimsXmlDatabase();
+            KitClaimsDatabase.Load();
 
             SaveManager.onPostSave += OnPostSave;
 
@@ -42,6 +46,7 @@ namespace RestoreMonarchy.Kits
         {
             SaveManager.onPostSave -= OnPostSave;
             KitCooldownsDatabase.Save();
+            KitClaimsDatabase.Save();
 
             Logger.Log($"{Name} has been unloaded!", ConsoleColor.Yellow);
         }
@@ -89,7 +94,13 @@ namespace RestoreMonarchy.Kits
             { "HourShort", "{0}h" },
             { "MinuteShort", "{0}m" },
             { "SecondShort", "{0}s" },
-            { "KitAdminBypassPermission", "You have bypassed kit cooldown, because you are admin or have kits.admin permission." }
+            { "KitAdminBypassPermission", "You have bypassed kit cooldown, because you are admin or have kits.admin permission." },
+            { "KitAlreadyClaimed", "You have already claimed kit [[b]]{0}[[/b]] the maximum number of times ([[b]]{1}[[/b]])." },
+            { "KitClaimsFormat", "({0}/{1})" },
+            { "ResetKitCommandSyntax", "Usage: /resetkit <player|steamId|all> [kitName]" },
+            { "ResetKitNoClaims", "No claims found to reset for [[b]]{0}[[/b]]." },
+            { "ResetKitPlayer", "Reset [[b]]{0}[[/b]] claim(s) for player [[b]]{1}[[/b]]." },
+            { "ResetKitAll", "Reset [[b]]{0}[[/b]] claim(s) across all players." }
         };
 
         public KitCooldown GetCooldown(string steamId, string kitName)
@@ -102,6 +113,41 @@ namespace RestoreMonarchy.Kits
         private void OnPostSave()
         {
             KitCooldownsDatabase.Save();
+            KitClaimsDatabase.Save();
+        }
+
+        public KitClaim GetClaim(string steamId, string kitName)
+        {
+            return Claims.Find(x => x.SteamId == steamId && x.KitName.Equals(kitName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public bool HasReachedMaxClaims(string steamId, string kitName, int maxClaims)
+        {
+            if (maxClaims <= 0) return false;
+            KitClaim claim = GetClaim(steamId, kitName);
+            return claim != null && claim.Count >= maxClaims;
+        }
+
+        public KitClaim RecordClaim(string steamId, string kitName)
+        {
+            KitClaim claim = GetClaim(steamId, kitName);
+            if (claim == null)
+            {
+                claim = new KitClaim
+                {
+                    SteamId = steamId,
+                    KitName = kitName,
+                    Count = 1,
+                    LastClaimedAt = DateTime.Now
+                };
+                Claims.Add(claim);
+            }
+            else
+            {
+                claim.Count++;
+                claim.LastClaimedAt = DateTime.Now;
+            }
+            return claim;
         }
 
         public string FormatTimespan(TimeSpan span)

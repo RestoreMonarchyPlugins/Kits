@@ -31,8 +31,10 @@ namespace RestoreMonarchy.Kits.Commands
 
             pluginInstance.Kits.Remove(kit);
             pluginInstance.Cooldowns.RemoveAll(x => x.KitName.Equals(kit.Name, StringComparison.OrdinalIgnoreCase));
+            pluginInstance.Claims.RemoveAll(x => x.KitName.Equals(kit.Name, StringComparison.OrdinalIgnoreCase));
             pluginInstance.KitsDatabase.Save();
             pluginInstance.KitCooldownsDatabase.Save();
+            pluginInstance.KitClaimsDatabase.Save();
             pluginInstance.SendMessageToPlayer(caller, "KitDeleted", kit.Name);
         }
 

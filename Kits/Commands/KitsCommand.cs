@@ -44,7 +44,14 @@ namespace RestoreMonarchy.Kits.Commands
                     string timeLeft = pluginInstance.FormatTimespanShort(timeSpan);
                     kitCooldown = pluginInstance.Translate("KitCooldownFormat", timeLeft);
                 }
-                sb.Append(" " + kitName + kitPrice + kitCooldown + ",");
+                string kitClaims = "";
+                if (kit.MaxClaims > 0 && !hasKitAdmin)
+                {
+                    KitClaim claim = pluginInstance.GetClaim(caller.Id, kit.Name);
+                    int count = claim?.Count ?? 0;
+                    kitClaims = pluginInstance.Translate("KitClaimsFormat", count, kit.MaxClaims);
+                }
+                sb.Append(" " + kitName + kitPrice + kitCooldown + kitClaims + ",");
             }
 
             string availableKits = sb.ToString().TrimEnd(',').TrimStart();

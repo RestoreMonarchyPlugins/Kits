@@ -25,6 +25,9 @@ namespace RestoreMonarchy.Kits.Models
         [XmlAttribute]
         public string VehicleName { get; set; }
         public bool ShouldSerializeVehicleName() => !string.IsNullOrEmpty(VehicleName);
+        [XmlAttribute]
+        public int MaxClaims { get; set; }
+        public bool ShouldSerializeMaxClaims() => MaxClaims > 0;
 
         [XmlArrayItem("Item")]
         public List<KitItem> Items { get; set; }
