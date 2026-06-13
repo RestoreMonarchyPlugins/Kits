@@ -76,6 +76,7 @@ namespace RestoreMonarchy.Kits
             { "KitPriceFormat", "[${0}]" },
             { "KitCooldownFormat", "({0})" },
             { "KitsAvailable", "Your kits: {0}" },
+            { "KitsAvailableContinued", "{0}" },
             { "DeleteKitCommandSyntax", "You must specify kit name." },
             { "KitDeleted", "Deleted kit [[b]]{0}[[/b]]." },
             { "KitNoPermission", "You don't have permission to use kit [[b]]{0}[[/b]]." },

@@ -60,6 +60,15 @@ namespace RestoreMonarchy.Kits.Commands
             // so this is a safe over-estimate.
             const int maxMessageBytes = 1800;
 
+            // Only the first message carries the "Your kits:" label, the rest just continue
+            // the list.
+            bool isFirstMessage = true;
+            void SendChunk(string chunk)
+            {
+                pluginInstance.SendMessageToPlayer(caller, isFirstMessage ? "KitsAvailable" : "KitsAvailableContinued", chunk);
+                isFirstMessage = false;
+            }
+
             StringBuilder sb = new();
             int currentBytes = 0;
             foreach (string entry in entries)
@@ -69,7 +78,7 @@ namespace RestoreMonarchy.Kits.Commands
 
                 if (sb.Length > 0 && currentBytes + sepBytes + entryBytes > maxMessageBytes)
                 {
-                    pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", sb.ToString());
+                    SendChunk(sb.ToString());
                     sb.Clear();
                     currentBytes = 0;
                     sepBytes = 0;
@@ -85,7 +94,7 @@ namespace RestoreMonarchy.Kits.Commands
 
             if (sb.Length > 0)
             {
-                pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", sb.ToString());
+                SendChunk(sb.ToString());
             }
         }
 
