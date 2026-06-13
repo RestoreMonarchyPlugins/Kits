@@ -61,11 +61,18 @@ namespace RestoreMonarchy.Kits.Commands
             const int maxMessageBytes = 1800;
 
             // Only the first message carries the "Your kits:" label, the rest just continue
-            // the list.
+            // the list as raw text.
             bool isFirstMessage = true;
             void SendChunk(string chunk)
             {
-                pluginInstance.SendMessageToPlayer(caller, isFirstMessage ? "KitsAvailable" : "KitsAvailableContinued", chunk);
+                if (isFirstMessage)
+                {
+                    pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", chunk);
+                }
+                else
+                {
+                    pluginInstance.SendRawMessageToPlayer(caller, chunk);
+                }
                 isFirstMessage = false;
             }
 

@@ -76,7 +76,6 @@ namespace RestoreMonarchy.Kits
             { "KitPriceFormat", "[${0}]" },
             { "KitCooldownFormat", "({0})" },
             { "KitsAvailable", "Your kits: {0}" },
-            { "KitsAvailableContinued", "{0}" },
             { "DeleteKitCommandSyntax", "You must specify kit name." },
             { "KitDeleted", "Deleted kit [[b]]{0}[[/b]]." },
             { "KitNoPermission", "You don't have permission to use kit [[b]]{0}[[/b]]." },
@@ -187,7 +186,11 @@ namespace RestoreMonarchy.Kits
 
         public void SendMessageToPlayer(IRocketPlayer player, string translationKey, params object[] placeholder)
         {
-            string msg = Translate(translationKey, placeholder);
+            SendRawMessageToPlayer(player, Translate(translationKey, placeholder));
+        }
+
+        public void SendRawMessageToPlayer(IRocketPlayer player, string msg)
+        {
             msg = msg.Replace("[[", "<").Replace("]]", ">");
             if (player is ConsolePlayer)
             {
