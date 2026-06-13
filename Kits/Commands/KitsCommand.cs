@@ -29,9 +29,8 @@ namespace RestoreMonarchy.Kits.Commands
                 return;
             }
 
-            StringBuilder sb = new();
-
             bool hasKitAdmin = caller.HasPermission("kits.admin");
+            List<string> entries = new();
             foreach (Kit kit in kitsWithPermission)
             {
                 string kitName = pluginInstance.Translate("KitNameFormat", kit.Name);
@@ -51,12 +50,43 @@ namespace RestoreMonarchy.Kits.Commands
                     int count = claim?.Count ?? 0;
                     kitClaims = pluginInstance.Translate("KitClaimsFormat", count, kit.MaxClaims);
                 }
-                sb.Append(" " + kitName + kitPrice + kitCooldown + kitClaims + ",");
+                entries.Add(kitName + kitPrice + kitCooldown + kitClaims);
             }
 
-            string availableKits = sb.ToString().TrimEnd(',').TrimStart();
+            // Unturned silently truncates a chat message at 2048 bytes on the wire, which
+            // cuts mid rich-text tag and makes the whole line render blank. Split the kit
+            // list across multiple messages, keeping each well under the limit. Byte counts
+            // are measured on the raw [[ ]] markup which is longer than the < > it becomes,
+            // so this is a safe over-estimate.
+            const int maxMessageBytes = 1800;
 
-            pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", availableKits);
+            StringBuilder sb = new();
+            int currentBytes = 0;
+            foreach (string entry in entries)
+            {
+                int entryBytes = Encoding.UTF8.GetByteCount(entry);
+                int sepBytes = sb.Length == 0 ? 0 : 2;
+
+                if (sb.Length > 0 && currentBytes + sepBytes + entryBytes > maxMessageBytes)
+                {
+                    pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", sb.ToString());
+                    sb.Clear();
+                    currentBytes = 0;
+                    sepBytes = 0;
+                }
+
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+                sb.Append(entry);
+                currentBytes += sepBytes + entryBytes;
+            }
+
+            if (sb.Length > 0)
+            {
+                pluginInstance.SendMessageToPlayer(caller, "KitsAvailable", sb.ToString());
+            }
         }
 
         public AllowedCaller AllowedCaller => AllowedCaller.Both;
